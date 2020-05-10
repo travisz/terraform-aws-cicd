@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:*"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "${artifact_bucket}/*",
+                "${artifact_bucket}"
+            ]
+        },
+        {
+            "Action": [
+                "kms:DescribeKey",
+                "kms:GenerateDataKey*",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:Decrypt"
+            ],
+            "Resource": "${aws_kms_key}",
+            "Effect": "Allow"
+        }
+    ]
+}
