@@ -54,7 +54,7 @@ resource "aws_codedeploy_deployment_group" "codedeploy_dg" {
       key   = "Name"
       type  = "KEY_AND_VALUE"
       value = var.tag_name_for_codedeploy
-   }
+    }
   }
 
 }
@@ -168,12 +168,12 @@ resource "aws_codepipeline" "codepipeline" {
     name = "Deploy"
 
     action {
-      name             = "Deploy"
-      category         = "Deploy"
-      owner            = "AWS"
-      provider         = "CodeDeploy"
-      input_artifacts  = ["source"]
-      version          = "1"
+      name            = "Deploy"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      input_artifacts = ["source"]
+      version         = "1"
 
       configuration = {
         ApplicationName     = aws_codedeploy_app.codedeploy.name
