@@ -1,13 +1,17 @@
-output "artifact_bucket" {
+output "artifact_bucket_id" {
   value = aws_s3_bucket.artifact_bucket.id
 }
 
-output "codebuild_package_id" {
-  value = aws_codebuild_project.package.id
+output "artifact_bucket_arn" {
+  value = aws_s3_bucket.artifact_bucket.arn
 }
 
 output "codepipeline_id" {
   value = aws_codepipeline.codepipeline.id
+}
+
+output "kms_key_arn" {
+  value = aws_kms_key.artifact_key.arn
 }
 
 output "repo_https_endpoint" {

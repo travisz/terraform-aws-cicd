@@ -1,3 +1,8 @@
+variable "asg_groups" {
+  description = "List of the auto-scaling groups to associate with CodeDeploy's Deployment Group"
+  type        = list
+}
+
 variable "build_compute_type" {
   default     = "BUILD_GENERAL1_SMALL"
   description = "Size of the CodeBuild Compute Tier (default: BUILD_GENERAL1_SMALL)"
@@ -47,5 +52,10 @@ variable "repo_default_branch" {
 
 variable "repo_name" {
   description = "Name of the respoitory to create in CodeCommit"
+  type        = string
+}
+
+variable "tag_name_for_codedeploy" {
+  description = "The Tag to use for the CodeDeploy Deployment Group"
   type        = string
 }
