@@ -168,6 +168,78 @@ resource "aws_sns_topic" "approval" {
   name = "${var.repo_name}-deployment-approval"
 }
 
+# CloudWatch Events Trigger
+resource "aws_cloudwatch_event_rule" "pipeline_state_update" {
+  name        = "${var.repo_name}-pipeline-updated"
+  description = "Capture state chanages in CodeCommit for ${var.repo_name}"
+
+  event_pattern = <<EOF
+{
+  "source": [ "aws.codecommit" ],
+  "detail-type": [ "CodeCommit Repository State Change" ],
+  "resources": ["${aws_codecommit_repository.repo.arn}"],
+  "detail": {
+    "referenceType": ["branch"],
+    "referenceName": ["${var.repo_default_branch}"]
+  }
+}
+EOF
+}
+
+# CloudWatch Events Target
+resource "aws_cloudwatch_event_target" "pipeline" {
+  target_id = "1"
+  rule      = aws_cloudwatch_event_rule.pipeline_state_update.name
+  arn       = aws_codepipeline.codepipeline.arn
+  role_arn  = aws_iam_role.cloudwatch.arn
+}
+
+# Trust Policy for CloudWatch Events
+data "aws_iam_policy_document" "cloudwatch_policy_document" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
+
+# IAM Role for CloudWatch Events
+resource "aws_iam_role" "cloudwatch" {
+  name               = "cloudwatch-role"
+  assume_role_policy = data.aws_iam_policy_document.cloudwatch_policy_document.json
+}
+
+resource "aws_iam_policy" "cloudwatch_permission_policy" {
+  name        = "cloudwatch-permission-policy"
+  description = "CloudWatch Permission Policy for ${var.repo_name} and CodePipeline"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "codepipeline:StartPipelineExecution"
+            ],
+            "Resource": [
+                "${aws_codepipeline.codepipeline.arn}"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch" {
+  policy_arn = aws_iam_policy.cloudwatch_permission_policy.arn
+  role       = aws_iam_role.cloudwatch.name
+}
+
 # CodePipeline Creation
 resource "aws_codepipeline" "codepipeline" {
   name     = var.repo_name
