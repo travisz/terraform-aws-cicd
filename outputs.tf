@@ -6,6 +6,10 @@ output "artifact_bucket_arn" {
   value = aws_s3_bucket.artifact_bucket.arn
 }
 
+output "codebuild_package_id" {
+  value = aws_codebuild_project.package.id
+}
+
 output "codepipeline_id" {
   value = aws_codepipeline.codepipeline.id
 }
