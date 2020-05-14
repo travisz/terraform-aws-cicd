@@ -275,6 +275,23 @@ resource "aws_codepipeline" "codepipeline" {
   }
 
   stage {
+    name = "Approval"
+
+    action {
+      name     = "Approval"
+      category = "Approval"
+      owner    = "AWS"
+      provider = "Manual"
+      version  = "1"
+
+      configuration = {
+        NotificationArn = aws_sns_topic.approval.arn
+        CustomData      = "Approve Code Deployment for ${var.repo_name}"
+      }
+    }
+  }
+
+  stage {
     name = "Package"
 
     action {
@@ -288,23 +305,6 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ProjectName = aws_codebuild_project.package.name
-      }
-    }
-  }
-
-  stage {
-    name = "Approval"
-
-    action {
-      name     = "Approval"
-      category = "Approval"
-      owner    = "AWS"
-      provider = "Manual"
-      version  = "1"
-
-      configuration = {
-        NotificationArn = aws_sns_topic.approval.arn
-        CustomData      = "Approve Code Deployment for ${var.repo_name}"
       }
     }
   }
